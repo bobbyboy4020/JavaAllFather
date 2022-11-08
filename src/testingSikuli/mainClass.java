@@ -6,20 +6,35 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.sikuli.basics.*;
 import org.sikuli.script.*;
 import java.time.LocalDate;
 import testingSikuli.FreshReporting;
 
 public class mainClass {
-	
 	public static final String IMGPATH = "C:\\Users\\hkarn\\eclipse-workspace\\testingSikuli\\imgs\\";
-	public static final Pattern JOBSEE = new Pattern(IMGPATH+"jobsEE.png");
-	public static final Pattern JOBSELECTEE = new Pattern(IMGPATH+"jobsSelectEE.png");
-	public static final Pattern OKBUTTONEE = new Pattern(IMGPATH+"okButtonEE.png");
-	public static final Pattern BROWSER = new Pattern(IMGPATH+"fileBrowserBar.png");
-	public static final Pattern BROWSERLEFT = new Pattern(IMGPATH+"fileBrowserBarLeft.png");
-	
 	public static final String reportSaveLoc = "C:\\Users\\hkarn\\Documents\\PDF\\FreshReports\\Nov 1 - Nov 18";
+	
+	public static final Pattern jobsEE = new Pattern(IMGPATH+"jobsEE.png");
+	public static final Pattern jobSelectEE = new Pattern(IMGPATH+"jobsSelectEE.png");
+	public static final Pattern okButtonEE = new Pattern(IMGPATH+"okButtonEE.png");
+	public static final Pattern browser = new Pattern(IMGPATH+"fileBrowserBar.png");
+	public static final Pattern browserLeft = new Pattern(IMGPATH+"fileBrowserBarLeft.png");
+	public static final Pattern viewAssociation = new Pattern(IMGPATH+"viewAssociation.png");
+	public static final Pattern exeCheck = new Pattern(IMGPATH+"exeCheck.png");
+	public static final Pattern editFileEE = new Pattern(IMGPATH+"editFileEE.png");
+	public static final Pattern exeDoneCheck = new Pattern(IMGPATH+"exeDoneCheck.png");
+	public static final Pattern exeDoneCheck2 = new Pattern(IMGPATH+"exeDoneCheck2.png");
+	public static final Pattern adobePrinter = new Pattern(IMGPATH+"adobePrinter.png");
+	public static final Pattern sortButtonEE = new Pattern(IMGPATH+"sortButtonEE.png");
+	public static final Pattern quickSort = new Pattern(IMGPATH+"quickSort.png");
+	public static final Pattern reportsPage1 = new Pattern(IMGPATH+"reportsPage1.png");
+	public static final Pattern reportsName = new Pattern(IMGPATH+"reportsName.png");
+	public static final Pattern printCardType = new Pattern(IMGPATH+"printCardType.png");
+	public static final Pattern printPreviewCards = new Pattern(IMGPATH+"printPreviewCards.png");
+	public static final Pattern printAdobeCCards = new Pattern(IMGPATH+"printAdobeCCards.png");
+	public static final Pattern selectAdobePDF = new Pattern(IMGPATH+"selectAdobePDF.png");
 	
 	public static ArrayList<String> sortArray = new ArrayList<String>();
 	
@@ -29,21 +44,11 @@ public class mainClass {
 	public static void main(String[] args) throws Exception {
 		screenOne = new Screen(0);
 		screenTwo = new Screen(1);
+		Settings.AutoWaitTimeout = 60;
+		Settings.MoveMouseDelay = 0;
 		ArrayList<String> jobCodes = new ArrayList<String>();
-        /*try{
-                List<App> apps = App.getApps();
-                for(App app:apps) {
-                	strang += app.getName();
-                }
-                s.paste(strang);
-        }
-        catch(Exception e){
-                e.printStackTrace();
-        }*/
 		jobCodes = CopyJobCodes(screenTwo);
-		for(String s:jobCodes) {
-			System.out.println(s);
-		}
+		FreshReport(screenOne, jobCodes);
 	}
 	
 	static String CopyClipboard(Screen s) throws UnsupportedFlavorException, IOException {
@@ -52,11 +57,10 @@ public class mainClass {
 		s.type("c", KeyModifier.CTRL);
 		return (String) c.getData(DataFlavor.stringFlavor);
 	}
-	
 	static ArrayList<String> CopyJobCodes(Screen screen) throws FindFailed, Exception, IOException {
 		Pattern jobCheck = new Pattern(IMGPATH+"JobsCheck.png");
 		ArrayList<String> jobCodes = new ArrayList<String>();
-		Location clicker = screen.find(jobCheck.similar(0.7).targetOffset(-82, 72)).getTarget();
+		Location clicker = screen.find(jobCheck.similar(0.7)).getTarget();
 		screen.click(clicker);
 		screen.click(clicker);
 		screen.click(clicker);
@@ -77,7 +81,6 @@ public class mainClass {
 		
 		return jobCodes;
 	}
-
 	static String JobLocation(Screen s) throws Exception {
 		String jobLoc = "";
 		Pattern fileBrowser = new Pattern(IMGPATH+"FileBrowserBar.png");
@@ -85,7 +88,6 @@ public class mainClass {
 		jobLoc = CopyClipboard(s);
 		return jobLoc;
 	}
-	
 	static Location JobFinder(Screen s, String code_) throws Exception {
 		Location clickLoc = new Location(0,0);
 		String code = code_;
@@ -114,7 +116,6 @@ public class mainClass {
 		
 		return clickLoc;
 	}
-	
 	static void PrintPop(Screen s) throws Exception {
 		Region reg = new Region(220,115,1480,850);
 		Pattern SavePDF = new Pattern(IMGPATH+"pdfSaveAs.png");
@@ -132,14 +133,10 @@ public class mainClass {
 			}
 		}
 	}
-	
-	static void FreshReporting(Screen s, ArrayList<String> jobCodes) throws Exception {
+	static void FreshReport(Screen s, ArrayList<String> jobCodes) throws Exception {
+		FreshReporting frb = new FreshReporting(jobCodes, screenOne);
+		frb.Fresh();
 	}
-	
-	
-	
-	
-	
 }
 
 
