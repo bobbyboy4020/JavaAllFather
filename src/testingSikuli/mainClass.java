@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 public class mainClass {
 	public static final String IMGPATH = "C:\\Users\\hkarn\\eclipse-workspace\\testingSikuli\\imgs\\";
-	public static final String reportSaveLoc = "C:\\Users\\hkarn\\Documents\\PDF\\FreshReports\\Nov 1 - Nov 18";
+	public static final String reportSaveLoc = "C:\\Users\\hkarn\\Documents\\PDF\\FreshReports\\Nov 21 - Dec 23";
 	
 	public static final Pattern jobsEE = new Pattern(IMGPATH+"jobsEE.png");
 	public static final Pattern jobSelectEE = new Pattern(IMGPATH+"jobsSelectEE.png");
@@ -41,47 +41,8 @@ public class mainClass {
 	
 	public static Screen screenOne;
 	public static Screen screenTwo;
-	public static JFrame main = new JFrame("Test");
     public static boolean frbDone = false;
-	
-	public static void popUp(String name, String name2, String name3, ArrayList<String> jobCodes) throws Exception {
-	    main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    JButton b1 = new JButton(name);
-	    JButton b2 = new JButton(name2);
-	    JButton b3 = new JButton(name3);
-	    b1.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		try {
-					FreshReport(jobCodes);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-	    		frbDone = true;
-	        }
-	    });
-	    b2.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		try {
-					Retake(jobCodes, frbDone);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-	    	}
-		});
-	    b3.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    		System.exit(0);
-	    	}
-	    });
-	    main.getContentPane().add(b1);
-	    main.getContentPane().add(b2);
-	    main.getContentPane().add(b3);
-	    main.pack();
-	    main.setLayout(new GridLayout(1,3));
-	    main.setSize(400, 150);
-	    main.setLocation(screenOne.w/2-200, screenOne.h/2-75);
-	    main.setVisible(true);
-	  }
+
 	
 	public static void main(String[] args) throws Exception {
 		screenOne = new Screen(0);
@@ -90,9 +51,22 @@ public class mainClass {
 		Settings.MoveMouseDelay = 0;
 		ArrayList<String> jobCodes = new ArrayList<String>();
 		jobCodes = CopyJobCodes(screenTwo);
-		//
 		
-		popUp("Reports", "Retakes", "Exit", jobCodes);
+		String choices = JOptionPane.showInputDialog("Job, 1 2 3");
+		JFrame f = new JFrame();
+		int choice = 0;
+		while(choice != 3) {
+			JOptionPane.showMessageDialog(f, choices);
+			choice = Integer.valueOf(choices);
+			if(choice == 1) {
+				FreshReport(jobCodes);
+				frbDone = true;
+			}
+			else if (choice == 2) {
+				Retake(jobCodes, frbDone);
+			}
+		}
+		
 	}
 	
 	static String CopyClipboard(Screen s) throws UnsupportedFlavorException, IOException {
@@ -101,9 +75,9 @@ public class mainClass {
 		return (String) c.getData(DataFlavor.stringFlavor);
 	}
 	static ArrayList<String> CopyJobCodes(Screen screen) throws FindFailed, Exception, IOException {
-		Pattern jobCheck = new Pattern(IMGPATH+"JobsCheck.png");
+		Pattern jobCheck = new Pattern(IMGPATH+"jobsCheck.png");
 		ArrayList<String> jobCodes = new ArrayList<String>();
-		Location clicker = screen.find(jobCheck.similar(0.7)).getTarget();
+		Location clicker = screen.find(jobCheck.similar(0.6)).getTarget();
 		screen.click(clicker);
 		screen.click(clicker);
 		screen.click(clicker);

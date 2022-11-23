@@ -55,7 +55,6 @@ public class FreshReporting {
 				FRBLaunch();
 			}
 		Thread.sleep(1000);
-		Thread.sleep(250);
 		frbApp = App.getApps("FreshReportBuilder.exe");
 		Region magReg = GetMagReg();
 		locMag = MagReport(magReg);
@@ -121,7 +120,7 @@ public class FreshReporting {
 	static void FrbFirstHalf(String job, App frbApp, Location locMag, Region frbReg) throws Exception {
 		frbApp.focus();
 		s.setAutoWaitTimeout(50);
-		Thread.sleep(2000);
+		Thread.sleep(1000);
 		s.click(locMag);
 		while (true){
 			if(frbReg.exists(frbMagniGlass) != null) {
@@ -134,7 +133,7 @@ public class FreshReporting {
 		}
 		Thread.sleep(1000);
 		s.paste(job.substring(0,10));
-		Thread.sleep(3000);
+		Thread.sleep(1000);
 		while (true){
 			if(frbReg.exists(reportMainCheck.exact()) != null) {
 				break;
@@ -143,7 +142,7 @@ public class FreshReporting {
 				Thread.sleep(200);
 			}
 		}
-		Thread.sleep(3000);
+		Thread.sleep(1000);
 		s.type(Key.ENTER);
 		while (true) {
 			if(frbReg.exists(frbMagniGlass) != null) {
@@ -158,7 +157,7 @@ public class FreshReporting {
 		Screen screenTwo = mainClass.screenTwo;
 		Thread.sleep(2000);
 		frbApp.focus();
-		s.wait(reportMainCheck.exact());
+		s.wait(reportMainCheck.similar(0.9));
 		s.click(locPrint);
 		while (true) 
 			if(frbReg.exists(frbAdobePrinter) != null) break;
@@ -191,8 +190,8 @@ public class FreshReporting {
 		frbReg.click(properties.similar(0.7).targetOffset(-51, -4));
 		
 		frbReg.click(printer1);
-		frbReg.click(printAllPages);
-		Thread.sleep(2000);
+		frbReg.click(printAllPages.targetOffset(0, -15));
+		Thread.sleep(1000);
 		screenTwo.doubleClick(reportSort.similar(0.65).targetOffset(0, -15));
 		String sort = mainClass.CopyClipboard(s);
 		mainClass.sortArray.add(sort);
