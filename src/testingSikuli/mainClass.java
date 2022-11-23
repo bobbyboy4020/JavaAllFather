@@ -4,13 +4,15 @@ import java.io.Console;
 import java.io.IOException;
 import java.awt.*;
 import java.awt.datatransfer.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
 
 import org.sikuli.basics.*;
 import org.sikuli.script.*;
 import java.time.LocalDate;
-import testingSikuli.FreshReporting;
 
 public class mainClass {
 	public static final String IMGPATH = "C:\\Users\\hkarn\\eclipse-workspace\\testingSikuli\\imgs\\";
@@ -34,12 +36,52 @@ public class mainClass {
 	public static final Pattern printCardType = new Pattern(IMGPATH+"printCardType.png");
 	public static final Pattern printPreviewCards = new Pattern(IMGPATH+"printPreviewCards.png");
 	public static final Pattern printAdobeCCards = new Pattern(IMGPATH+"printAdobeCCards.png");
-	public static final Pattern selectAdobePDF = new Pattern(IMGPATH+"selectAdobePDF.png");
 	
 	public static ArrayList<String> sortArray = new ArrayList<String>();
 	
 	public static Screen screenOne;
 	public static Screen screenTwo;
+	public static JFrame main = new JFrame("Test");
+    public static boolean frbDone = false;
+	
+	public static void popUp(String name, String name2, String name3, ArrayList<String> jobCodes) throws Exception {
+	    main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    JButton b1 = new JButton(name);
+	    JButton b2 = new JButton(name2);
+	    JButton b3 = new JButton(name3);
+	    b1.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		try {
+					FreshReport(jobCodes);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+	    		frbDone = true;
+	        }
+	    });
+	    b2.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		try {
+					Retake(jobCodes, frbDone);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+	    	}
+		});
+	    b3.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		System.exit(0);
+	    	}
+	    });
+	    main.getContentPane().add(b1);
+	    main.getContentPane().add(b2);
+	    main.getContentPane().add(b3);
+	    main.pack();
+	    main.setLayout(new GridLayout(1,3));
+	    main.setSize(400, 150);
+	    main.setLocation(screenOne.w/2-200, screenOne.h/2-75);
+	    main.setVisible(true);
+	  }
 	
 	public static void main(String[] args) throws Exception {
 		screenOne = new Screen(0);
@@ -48,12 +90,13 @@ public class mainClass {
 		Settings.MoveMouseDelay = 0;
 		ArrayList<String> jobCodes = new ArrayList<String>();
 		jobCodes = CopyJobCodes(screenTwo);
-		FreshReport(screenOne, jobCodes);
+		//
+		
+		popUp("Reports", "Retakes", "Exit", jobCodes);
 	}
 	
 	static String CopyClipboard(Screen s) throws UnsupportedFlavorException, IOException {
 		Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-		String clip = "";
 		s.type("c", KeyModifier.CTRL);
 		return (String) c.getData(DataFlavor.stringFlavor);
 	}
@@ -133,9 +176,13 @@ public class mainClass {
 			}
 		}
 	}
-	static void FreshReport(Screen s, ArrayList<String> jobCodes) throws Exception {
-		FreshReporting frb = new FreshReporting(jobCodes, screenOne);
+	static void FreshReport(ArrayList<String> jobCodes) throws Exception {
+		FreshReporting frb = new FreshReporting(screenOne, jobCodes);
 		frb.Fresh();
+	}
+	static void Retake(ArrayList<String> jobCodes, boolean frbDone) throws Exception {
+		Retaking ret = new Retaking(screenOne, jobCodes);
+		ret.Retake(frbDone);
 	}
 }
 

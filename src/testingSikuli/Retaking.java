@@ -2,6 +2,10 @@ package testingSikuli;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import org.sikuli.script.*;
 
@@ -13,15 +17,152 @@ public class Retaking {
 	private static final Pattern buttonFindSubject = new Pattern(IMGPATH+"Report\\buttonFindSubject.png");
 	private static final Pattern menuFindSubject = new Pattern(IMGPATH+"Report\\menuFindSubject.png");
 	private static final Pattern imageLoadCheck = new Pattern(IMGPATH+"Report\\imageLoadCheck.png");
-	private static final Pattern selectAdobePDF = new Pattern(IMGPATH+"selectAdobePDF.png");
-	private static final Pattern adobeDropDown = new Pattern(IMGPATH+"adobeDropDown.png");
+	private static final Pattern selectAdobePDF = new Pattern(IMGPATH+"Report\\selectAdobePDF.png");
+	private static final Pattern adobeDropDown = new Pattern(IMGPATH+"Report\\adobeDropDown.png");
 	
 	Screen s;
 	ArrayList<String> jobCodes;
 	
+	private static List<List<String>> codes;
+	private static List<String> sorts;
+	
+	
 	public Retaking(Screen s, ArrayList<String> jobCodes) {
 		this.s = s;
 		this.jobCodes = jobCodes;
+	}
+	public void Retake(boolean frbDone) throws Exception {
+		List<App> eeApp;
+		for(int i = 0; i < jobCodes.size(); i++) {//gets info from table into managable split entries
+			codes.add(Arrays.asList(jobCodes.get(i).toUpperCase().split("-")));
+		}
+		if(jobCodes.size() < 3) {
+			for(int i = 0; i < 3; i++) {
+				s.doubleClick(edgeIcon);
+				s.wait(edgeOpener);
+				s.click(edgeOpener.targetOffset(1,33));
+				Thread.sleep(500);
+			}
+		}
+		else {
+			for(int i = 0; i < jobCodes.size(); i++) {
+				s.doubleClick(edgeIcon);
+				s.wait(edgeOpener);
+				s.click(edgeOpener.targetOffset(1,33));
+				Thread.sleep(500);
+			}
+		}
+		eeApp = App.getApps("Edge Entry.exe");
+		Region eeReg = new Region(390,115,1140,844);
+		JFrame f = new JFrame();
+		for(int i = 0; i < jobCodes.size(); i+=3) {
+			int exeMake = 0;
+			int exeGood = 0;
+			try {
+				exeMake = JOptionPane.showConfirmDialog(f,"Make exes? " + jobCodes.get(i) + ", " + jobCodes.get(i+1) + ", " + jobCodes.get(i+2));
+				if (frbDone == false) {	
+					String dialog = "sorts for jobs? split by comma, enter nothing if all are default\nh for homeroom, g for grade, a for alpha\n" + jobCodes.get(i).toString() + ", " + jobCodes.get(i+1) + ", " + jobCodes.get(i+2);
+					String sort = JOptionPane.showInputDialog(f, dialog);
+					sorts.addAll(Arrays.asList(sort.split(",")));
+				}
+			}
+			catch (Exception e) {
+				try {
+					exeMake = JOptionPane.showConfirmDialog(f,"Make exes? " + jobCodes.get(i) + ", " + jobCodes.get(i+1));
+					if (frbDone == false) {
+						String dialog = "sorts for jobs? split by comma, enter nothing if all are default\nh for homeroom, g for grade, a for alpha\n" + jobCodes.get(i) + ", " + jobCodes.get(i+1);
+						String sort = JOptionPane.showInputDialog(f, dialog);
+						sorts.addAll(Arrays.asList(sort.split(",")));
+					}
+				} 
+				catch (Exception ex) {
+					try {
+						exeMake = JOptionPane.showConfirmDialog(f,"Make exes? " + jobCodes.get(i));
+						if (frbDone == false) {
+							String dialog = "sorts for jobs? split by comma, enter nothing if all are default\nh for homeroom, g for grade, a for alpha\n" + jobCodes.get(i);
+							String sort = JOptionPane.showInputDialog(f, dialog);
+							sorts.addAll(Arrays.asList(sort.split(",")));
+						}
+					} 
+					catch (Exception exc) {
+					}
+				}
+			}
+			
+			if (exeMake == JOptionPane.YES_OPTION) {
+				CreateJobRetake(codes.get(i), eeApp.get(0), eeReg);
+				MakeExe(codes.get(i), eeApp.get(0));
+				try {
+					CreateJobRetake(codes.get(i+1), eeApp.get(1), eeReg);
+					MakeExe(codes.get(i+1), eeApp.get(1));
+				} catch (Exception e) {
+					try {
+						eeApp.get(1).close();
+					} catch(Exception xe) {}
+				}
+				try {
+					CreateJobRetake(codes.get(i+2), eeApp.get(2), eeReg);
+					MakeExe(codes.get(i+2), eeApp.get(2));
+				} catch (Exception exc) {
+					try {
+						eeApp.get(2).close();
+					} catch (Exception ecx){}
+				}
+			}
+				
+			exeGood = JOptionPane.showConfirmDialog(f,"Exes made?");
+			if(exeGood == JOptionPane.YES_OPTION) {
+				if(frbDone)
+					SaveCardsRetake(codes.get(i), eeApp.get(0), true, eeReg, mainClass.sortArray.get(i));
+				else
+					SaveCardsRetake(codes.get(i), eeApp.get(0), true, eeReg, sorts.get(0));
+				try {
+					if(frbDone)
+						SaveCardsRetake(codes.get(i+1), eeApp.get(1), true, eeReg, mainClass.sortArray.get(i+1));
+					else
+						SaveCardsRetake(codes.get(i+1), eeApp.get(1), true, eeReg, sorts.get(1));
+				}
+				catch(Exception ex) {
+					try { SaveCardsRetake(codes.get(i+1), eeApp.get(1), true, eeReg, "");}
+					catch(Exception exc) {}
+				}
+				try {
+					if(frbDone) 
+						SaveCardsRetake(codes.get(i+2), eeApp.get(2), true, eeReg, mainClass.sortArray.get(i+2));
+					else
+						SaveCardsRetake(codes.get(i+2), eeApp.get(2), true, eeReg, sorts.get(2));
+				} catch(Exception e) {
+					try { SaveCardsRetake(codes.get(i+2), eeApp.get(2), true, eeReg, "");}
+					catch (Exception ex) {}
+				}
+			}
+			try {
+				if(codes.get(i).get(3) == "groups") {
+					eeApp.get(0).focus();
+					JOptionPane.showMessageDialog(f, jobCodes.get(i) + " has groups");
+				}
+			} catch (Exception ex) {}
+			try {
+				if(codes.get(i+1).get(3) == "groups") {
+					eeApp.get(1).focus();
+					JOptionPane.showMessageDialog(f, jobCodes.get(i+1) + " has groups");
+				}
+			} catch (Exception ex) {}
+			try {
+				if(codes.get(i+2).get(3) == "groups") {
+					eeApp.get(2).focus();
+					JOptionPane.showMessageDialog(f, jobCodes.get(i+2) + " has groups");
+				}
+			} catch (Exception ex) {}
+
+		}
+		JOptionPane.showMessageDialog(f, "retakes all done :)");
+		eeApp.get(0).close();
+		try {
+			eeApp.get(1).close();
+			eeApp.get(2).close();
+		} catch (Exception ex) {}
+		
 	}
 	
 	public void CreateJobRetake(List<String> codes, App eeApp, Region eeReg) throws Exception{
@@ -43,7 +184,7 @@ public class Retaking {
 		s.doubleClick(clickLoc);
 	}
 	
-	public void MakeEXE(List<String> codes, App eeApp) throws Exception {
+	public void MakeExe(List<String> codes, App eeApp) throws Exception {
 		eeApp.focus();
 		String jobLoc = "Q:\\Jobs23\\"+codes.get(0).toString()+"\\"+codes.get(1).toString();
 		Thread.sleep(500);
@@ -174,8 +315,8 @@ public class Retaking {
 		Thread.sleep(1000);
 		Region regon = new Region(0,0,150,150);
 		try {
-			regon.wait("ADOBEprintCCards.png");		//Wait for the camera cards to start printing
-			while (regon.exists("ADOBEprintCCards.png") != null) //while printing exists, stay printing
+			regon.wait(mainClass.printAdobeCCards);		//Wait for the camera cards to start printing
+			while (regon.exists(mainClass.printAdobeCCards) != null) //while printing exists, stay printing
 				Thread.sleep(1000);
 		}
 		catch (Exception ex) {
@@ -183,7 +324,7 @@ public class Retaking {
 		}
 		eeApp.focus();
 		Thread.sleep(1000);
-		eeReg.click(Pattern("PrintPreviewCards.png").targetOffset(459,-1));
+		eeReg.click(mainClass.printPreviewCards.targetOffset(459,-1));
 		Thread.sleep(2000);
 	}
 }

@@ -34,9 +34,9 @@ public class FreshReporting {
 	static ArrayList<String> jobCodes;
 	static Screen s;
 	
-	public FreshReporting(ArrayList<String> jobCodes, Screen s) throws Exception{
-		this.jobCodes = jobCodes;
-		this.s = s;
+	public FreshReporting(Screen s, ArrayList<String> jobCodes) throws Exception{
+		FreshReporting.jobCodes = jobCodes;
+		FreshReporting.s = s;
 	}
 	
 	public void Fresh() throws Exception { 
